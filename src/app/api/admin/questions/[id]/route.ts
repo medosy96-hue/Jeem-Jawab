@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { questions } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { CATEGORIES } from "@/lib/game";
+import { CATEGORIES, DIFFICULTY_LEVELS } from "@/lib/game";
 import { normalizeQuestionText } from "@/lib/question";
 
 /** تعديل سؤال */
@@ -18,12 +18,16 @@ export async function PUT(
 
   const body = await req.json().catch(() => ({}));
   const category = String(body?.category ?? "");
+  const difficulty = String(body?.difficulty ?? "medium");
   const text = String(body?.text ?? "").trim();
   const options: string[] = Array.isArray(body?.options) ? body.options.map((o: unknown) => String(o).trim()) : [];
   const correctIndex = Number(body?.correctIndex);
 
   if (!CATEGORIES.some((c) => c.id === category)) {
     return NextResponse.json({ error: "تصنيف غير صالح" }, { status: 400 });
+  }
+  if (!DIFFICULTY_LEVELS.some((d) => d.id === difficulty)) {
+    return NextResponse.json({ error: "مستوى صعوبة غير صالح" }, { status: 400 });
   }
   if (!text) return NextResponse.json({ error: "اكتب نص السؤال" }, { status: 400 });
   if (options.length !== 4 || options.some((o) => !o)) {
@@ -49,7 +53,7 @@ export async function PUT(
   try {
     await db
       .update(questions)
-      .set({ category, text, textKey, options, correctIndex })
+      .set({ category, difficulty, text, textKey, options, correctIndex })
       .where(eq(questions.id, qid));
     return NextResponse.json({ ok: true });
   } catch (error) {
@@ -63,16 +67,4 @@ export async function PUT(
   }
 }
 
-/** حذف سؤال */
-export async function DELETE(
-  _req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const { id } = await params;
-  const qid = Number(id);
-  if (!Number.isInteger(qid)) {
-    return NextResponse.json({ error: "معرّف غير صالح" }, { status: 400 });
-  }
-  await db.delete(questions).where(eq(questions.id, qid));
-  return NextResponse.json({ ok: true });
-}
+/** حذف الأسئلة معطّل لحماية البنك */

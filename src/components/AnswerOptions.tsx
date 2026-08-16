@@ -9,6 +9,7 @@ interface Props {
   selectedIndex: number | null;
   answered: boolean;
   reveal: boolean;
+  imageUrl?: string | null;
   onSelect: (i: number) => void;
 }
 
@@ -20,6 +21,7 @@ export function AnswerOptions({
   selectedIndex,
   answered,
   reveal,
+  imageUrl,
   onSelect,
 }: Props) {
   return (
@@ -27,6 +29,14 @@ export function AnswerOptions({
       <h2 className="text-lg leading-relaxed font-extrabold text-slate-900 sm:text-2xl">
         {text}
       </h2>
+      {imageUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={imageUrl}
+          alt="صورة السؤال"
+          className="mt-4 max-h-56 w-full rounded-2xl object-cover shadow-md"
+        />
+      ) : null}
       <div className="mt-5 grid gap-3">
         {options.map((opt, i) => {
           const color = ANSWER_COLORS[i];

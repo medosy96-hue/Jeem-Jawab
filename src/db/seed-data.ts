@@ -5,6 +5,9 @@ export interface SeedQuestion {
   correctIndex: number;
   /** يمنع ظهور أكثر من صياغة لنفس المعلومة في الجولات */
   familyKey?: string;
+  /** سهل | متوسط | صعب — الافتراضي متوسط إن لم يُحدد */
+  difficulty?: "easy" | "medium" | "hard";
+  imageUrl?: string;
 }
 
 export const SEED_QUESTIONS: SeedQuestion[] = [

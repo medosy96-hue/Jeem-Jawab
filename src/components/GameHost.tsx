@@ -11,7 +11,7 @@ import { AnswerOptions } from "./AnswerOptions";
 import { LeaderboardList } from "./LeaderboardList";
 import { Podium } from "./Podium";
 import { Brand } from "./Brand";
-import { CATEGORIES } from "@/lib/game";
+import { CATEGORIES, DIFFICULTY_LEVELS } from "@/lib/game";
 import type { GameState } from "@/lib/types";
 
 interface StoredHost {
@@ -331,6 +331,7 @@ export function GameHost({ code }: { code: string }) {
                     selectedIndex={state.my?.selectedIndex ?? pendingAnswer}
                     answered={!!state.my?.answered || submittingAnswer}
                     reveal={state.phase === "break"}
+                    imageUrl={state.question.imageUrl}
                     onSelect={submitAnswer}
                   />
                 </div>
@@ -569,6 +570,23 @@ function Lobby({
                 >
                   {CATEGORIES.find((c) => c.id === id)?.emoji}{" "}
                   {CATEGORIES.find((c) => c.id === id)?.label}
+                </span>
+              ))
+            )}
+          </div>
+          <div className="mt-2 flex flex-wrap justify-center gap-1.5">
+            {state.difficulties.length === 0 ? (
+              <span className="rounded-full bg-white/10 px-3 py-1 text-[11px] font-black text-white/60">
+                🎲 كل مستويات الصعوبة
+              </span>
+            ) : (
+              state.difficulties.map((id) => (
+                <span
+                  key={id}
+                  className="rounded-full bg-amber-400/15 px-3 py-1 text-[11px] font-black text-amber-100"
+                >
+                  {DIFFICULTY_LEVELS.find((d) => d.id === id)?.emoji}{" "}
+                  {DIFFICULTY_LEVELS.find((d) => d.id === id)?.label}
                 </span>
               ))
             )}

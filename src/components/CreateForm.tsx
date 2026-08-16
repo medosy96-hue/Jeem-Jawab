@@ -9,6 +9,7 @@ import {
   RESULT_TIME_OPTIONS,
   TOTAL_QUESTIONS_OPTIONS,
   CATEGORIES,
+  DIFFICULTY_LEVELS,
 } from "@/lib/game";
 
 /** نموذج إنشاء لعبة جديدة */
@@ -20,6 +21,7 @@ export function CreateForm({ mode }: { mode: "local" | "online" }) {
   const [totalQuestions, setTotalQuestions] = useState(20);
   const [manualAdvance, setManualAdvance] = useState(false);
   const [categories, setCategories] = useState<string[]>([]);
+  const [difficulties, setDifficulties] = useState<string[]>([]);
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -43,6 +45,7 @@ export function CreateForm({ mode }: { mode: "local" | "online" }) {
           totalQuestions,
           manualAdvance,
           categories,
+          difficulties,
         }),
       });
       const data = await res.json().catch(() => ({}));
@@ -136,6 +139,56 @@ export function CreateForm({ mode }: { mode: "local" | "online" }) {
                 ? "سيتم اختيار أسئلة من جميع التصنيفات"
                 : `ستتضمن اللعبة: ${categories
                     .map((id) => CATEGORIES.find((c) => c.id === id)?.label)
+                    .join("، ")}`}
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-white/10 bg-black/25 p-4">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-sm font-black text-white">🎚️ مستوى الصعوبة</span>
+              <button
+                type="button"
+                onClick={() => setDifficulties([])}
+                className={`rounded-full px-3 py-1 text-[11px] font-black transition ${
+                  difficulties.length === 0
+                    ? "bg-emerald-600 text-white"
+                    : "bg-white/10 text-white/60 hover:bg-white/20"
+                }`}
+              >
+                الكل 🎲
+              </button>
+            </div>
+            <div className="mt-3 grid grid-cols-3 gap-2">
+              {DIFFICULTY_LEVELS.map((level) => {
+                const active = difficulties.includes(level.id);
+                return (
+                  <button
+                    key={level.id}
+                    type="button"
+                    onClick={() =>
+                      setDifficulties((current) =>
+                        active
+                          ? current.filter((id) => id !== level.id)
+                          : [...current, level.id]
+                      )
+                    }
+                    className={`rounded-xl px-3 py-2.5 text-xs font-black transition ${
+                      active
+                        ? "bg-red-600 text-white ring-2 ring-red-300"
+                        : "bg-white/10 text-white/60 hover:bg-white/20"
+                    }`}
+                  >
+                    {level.emoji} {level.label}
+                    {active ? " ✓" : ""}
+                  </button>
+                );
+              })}
+            </div>
+            <p className="mt-2 text-[11px] font-bold text-white/40">
+              {difficulties.length === 0
+                ? "سيتم اختيار أسئلة من كل المستويات (سهل ومتوسط وصعب)"
+                : `ستتضمن اللعبة فقط: ${difficulties
+                    .map((id) => DIFFICULTY_LEVELS.find((d) => d.id === id)?.label)
                     .join("، ")}`}
             </p>
           </div>

@@ -2,13 +2,15 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { CATEGORIES, categoryEmoji, categoryLabel } from "@/lib/game";
+import { CATEGORIES, DIFFICULTY_LEVELS } from "@/lib/game";
 import { CategoryBadge } from "@/components/CategoryBadge";
+import { DifficultyBadge } from "@/components/DifficultyBadge";
 import { Brand } from "@/components/Brand";
 
 interface AdminQuestion {
   id: number;
   category: string;
+  difficulty: string;
   text: string;
   options: string[];
   correctIndex: number;
@@ -16,11 +18,16 @@ interface AdminQuestion {
 
 interface AdminData {
   questions: AdminQuestion[];
-  stats: { total: number; perCategory: Record<string, number> };
+  stats: {
+    total: number;
+    perCategory: Record<string, number>;
+    perDifficulty: Record<string, number>;
+  };
 }
 
 const EMPTY_FORM = {
   category: "adab",
+  difficulty: "medium",
   text: "",
   options: ["", "", "", ""],
   correctIndex: 0,
@@ -31,6 +38,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>("all");
+  const [difficultyFilter, setDifficultyFilter] = useState<string>("all");
   const [search, setSearch] = useState("");
   const [form, setForm] = useState(EMPTY_FORM);
   const [editId, setEditId] = useState<number | null>(null);
@@ -103,21 +111,13 @@ export default function AdminPage() {
     setEditId(q.id);
     setForm({
       category: q.category,
+      difficulty: q.difficulty,
       text: q.text,
       options: [...q.options],
       correctIndex: q.correctIndex,
     });
     setFormError(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const remove = async (id: number) => {
-    if (!confirm("هل تريد حذف هذا السؤال؟")) return;
-    const res = await fetch(`/api/admin/questions/${id}`, { method: "DELETE" });
-    if (res.ok) {
-      setNotice("🗑️ تم حذف السؤال");
-      await load();
-    }
   };
 
   const cancelEdit = () => {
@@ -128,8 +128,9 @@ export default function AdminPage() {
 
   const filtered = (data?.questions ?? []).filter((q) => {
     const okCat = filter === "all" || q.category === filter;
+    const okDifficulty = difficultyFilter === "all" || q.difficulty === difficultyFilter;
     const okSearch = !search.trim() || q.text.includes(search.trim());
-    return okCat && okSearch;
+    return okCat && okDifficulty && okSearch;
   });
 
   return (
@@ -167,6 +168,19 @@ export default function AdminPage() {
           </div>
         )}
 
+        {data && (
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            {DIFFICULTY_LEVELS.map((d) => (
+              <span
+                key={d.id}
+                className="rounded-full bg-white/10 px-3 py-1.5 text-xs font-black text-white/80"
+              >
+                {d.emoji} {d.label}: {data.stats.perDifficulty[d.id] ?? 0}
+              </span>
+            ))}
+          </div>
+        )}
+
         {/* تعبئة البنك */}
         {data && data.stats.total < 2054 && (
           <button
@@ -174,7 +188,7 @@ export default function AdminPage() {
             disabled={seeding}
             className="mt-4 w-full rounded-2xl bg-gradient-to-l from-emerald-500 to-teal-500 py-4 text-lg font-black text-white shadow-xl transition hover:brightness-110 disabled:opacity-50"
           >
-            {seeding ? "جارٍ التعبئة..." : "🌱 مزامنة بنك الأسئلة الكامل (2054 سؤالاً جاهزاً)"}
+            {seeding ? "جارٍ التعبئة..." : "🌱 مزامنة بنك الأسئلة الكامل (الأسئلة الجديدة جاهزة)"}
           </button>
         )}
         {notice && (
@@ -231,6 +245,26 @@ export default function AdminPage() {
             </div>
           </label>
         </div>
+
+        <label className="mt-3 block">
+          <span className="text-xs font-black text-white/60">مستوى الصعوبة</span>
+          <div className="mt-1 flex gap-2">
+            {DIFFICULTY_LEVELS.map((d) => (
+              <button
+                key={d.id}
+                type="button"
+                onClick={() => setForm({ ...form, difficulty: d.id })}
+                className={`flex-1 rounded-xl py-2.5 text-sm font-black transition ${
+                  form.difficulty === d.id
+                    ? "bg-amber-500 text-slate-950"
+                    : "bg-white/10 text-white/60 hover:bg-white/20"
+                }`}
+              >
+                {d.emoji} {d.label}
+              </button>
+            ))}
+          </div>
+        </label>
 
         <label className="mt-3 block">
           <span className="text-xs font-black text-white/60">نص السؤال</span>
@@ -308,6 +342,26 @@ export default function AdminPage() {
             {c.emoji} {c.label}
           </button>
         ))}
+        <span className="mx-1 h-5 w-px bg-white/15" />
+        <button
+          onClick={() => setDifficultyFilter("all")}
+          className={`rounded-full px-4 py-1.5 text-xs font-black transition ${
+            difficultyFilter === "all" ? "bg-white text-slate-900" : "bg-white/10 text-white/70 hover:bg-white/20"
+          }`}
+        >
+          كل المستويات
+        </button>
+        {DIFFICULTY_LEVELS.map((d) => (
+          <button
+            key={d.id}
+            onClick={() => setDifficultyFilter(d.id)}
+            className={`rounded-full px-4 py-1.5 text-xs font-black transition ${
+              difficultyFilter === d.id ? "bg-white text-slate-900" : "bg-white/10 text-white/70 hover:bg-white/20"
+            }`}
+          >
+            {d.emoji} {d.label}
+          </button>
+        ))}
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -341,6 +395,7 @@ export default function AdminPage() {
                 <div className="flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <CategoryBadge category={q.category} size="sm" />
+                    <DifficultyBadge difficulty={q.difficulty} size="sm" />
                     <span className="text-[10px] font-black text-white/40"># {q.id}</span>
                   </div>
                   <p className="mt-2 font-black text-white">{q.text}</p>
@@ -365,12 +420,6 @@ export default function AdminPage() {
                     className="rounded-xl bg-white/10 px-3 py-2 text-xs font-black text-white transition hover:bg-sky-500/30"
                   >
                     ✏️
-                  </button>
-                  <button
-                    onClick={() => remove(q.id)}
-                    className="rounded-xl bg-white/10 px-3 py-2 text-xs font-black text-white transition hover:bg-rose-500/30"
-                  >
-                    🗑️
                   </button>
                 </div>
               </div>

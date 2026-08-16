@@ -40,6 +40,12 @@ export const CATEGORIES = [
   { id: "arabic-tv", label: "مسلسلات وأفلام عربية", emoji: "🎬" },
   { id: "spacetoon", label: "كرتون سبيستون", emoji: "🎮" },
   { id: "companions", label: "الصحابة والأنبياء", emoji: "⭐" },
+  { id: "geography", label: "جغرافيا", emoji: "🌍" },
+  { id: "history", label: "تاريخ", emoji: "🏛️" },
+  { id: "physics", label: "فيزياء", emoji: "⚛️" },
+  { id: "chemistry", label: "كيمياء", emoji: "🧪" },
+  { id: "animals", label: "حيوانات", emoji: "🦁" },
+  { id: "plants", label: "نباتات", emoji: "🌿" },
 ] as const;
 
 export type CategoryId = (typeof CATEGORIES)[number]["id"];
@@ -52,6 +58,38 @@ export function categoryEmoji(id: string): string {
   return CATEGORIES.find((c) => c.id === id)?.emoji ?? "❓";
 }
 
+/** مستويات الصعوبة */
+export const DIFFICULTY_LEVELS = [
+  { id: "easy", label: "سهل", emoji: "🟢" },
+  { id: "medium", label: "متوسط", emoji: "🟡" },
+  { id: "hard", label: "صعب", emoji: "🔴" },
+] as const;
+
+export type DifficultyId = (typeof DIFFICULTY_LEVELS)[number]["id"];
+
+export function difficultyLabel(id: string): string {
+  return DIFFICULTY_LEVELS.find((d) => d.id === id)?.label ?? id;
+}
+
+export function difficultyEmoji(id: string): string {
+  return DIFFICULTY_LEVELS.find((d) => d.id === id)?.emoji ?? "❔";
+}
+
+export const DIFFICULTY_COLORS: Record<string, string> = {
+  easy: "bg-emerald-500/20 text-emerald-200 border-emerald-400/40",
+  medium: "bg-amber-400/20 text-amber-200 border-amber-400/40",
+  hard: "bg-red-500/20 text-red-200 border-red-400/40",
+};
+
+/** يبقي فقط قيم الصعوبة المعروفة، ويتجاهل أي قيمة غير صالحة */
+export function validDifficulties(value: unknown): string[] {
+  const validIds = new Set<string>(DIFFICULTY_LEVELS.map((d) => d.id));
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((id) => String(id))
+    .filter((id) => validIds.has(id));
+}
+
 export const CATEGORY_COLORS: Record<string, string> = {
   adab: "bg-emerald-500/20 text-emerald-200 border-emerald-400/40",
   science: "bg-white/15 text-white border-white/30",
@@ -60,6 +98,12 @@ export const CATEGORY_COLORS: Record<string, string> = {
   "arabic-tv": "bg-red-500/20 text-red-200 border-red-400/40",
   spacetoon: "bg-rose-600/20 text-rose-200 border-rose-400/40",
   companions: "bg-slate-500/25 text-slate-100 border-slate-300/30",
+  geography: "bg-sky-500/20 text-sky-200 border-sky-400/40",
+  history: "bg-amber-700/25 text-amber-100 border-amber-500/40",
+  physics: "bg-violet-500/20 text-violet-200 border-violet-400/40",
+  chemistry: "bg-lime-500/20 text-lime-200 border-lime-400/40",
+  animals: "bg-orange-500/20 text-orange-200 border-orange-400/40",
+  plants: "bg-green-500/20 text-green-200 border-green-400/40",
 };
 
 export const ANSWER_COLORS = [
@@ -120,12 +164,11 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-/** اختيار عدد محدد من الأسئلة المتنوعة مع تفضيل المستوى المتوسط والصعب */
+/** اختيار عدد محدد من الأسئلة المتنوعة عشوائياً بلا تحيّز لمستوى صعوبة معيّن */
 export function pickQuestions(
   questions: {
     id: number;
     category: string;
-    level?: "basic" | "advanced";
     familyKey?: string | null;
   }[],
   count = TOTAL_QUESTIONS
@@ -153,18 +196,7 @@ export function pickQuestions(
   const picked: Pickable[] = [];
   for (const list of byCat.values()) {
     const categoryPool = uniqueFamilies(shuffle(list));
-    const advanced = categoryPool.filter((question) => question.level !== "basic");
-    const selected = advanced.slice(0, perCategory);
-
-    if (selected.length < perCategory) {
-      const usedFamilies = new Set(selected.map(familyOf));
-      selected.push(
-        ...categoryPool
-          .filter((question) => !usedFamilies.has(familyOf(question)))
-          .slice(0, perCategory - selected.length)
-      );
-    }
-
+    const selected = categoryPool.slice(0, perCategory);
     picked.push(...selected);
   }
 

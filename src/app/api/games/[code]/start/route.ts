@@ -3,9 +3,6 @@ import { db } from "@/db";
 import { games, players, questions } from "@/db/schema";
 import { eq, and, ne } from "drizzle-orm";
 import { pickQuestions } from "@/lib/game";
-import { SEED_QUESTIONS } from "@/db/seed-data";
-
-const BASIC_QUESTION_TEXTS = new Set(SEED_QUESTIONS.map((question) => question.text));
 
 /** بدء اللعبة (المضيف فقط) */
 export async function POST(
@@ -60,7 +57,7 @@ export async function POST(
       .select({
         id: questions.id,
         category: questions.category,
-        text: questions.text,
+        difficulty: questions.difficulty,
         familyKey: questions.familyKey,
       })
       .from(questions),
@@ -82,11 +79,12 @@ export async function POST(
       return question?.familyKey ?? `question:${id}`;
     })
   );
-  const categoryQuestions = questionRows.filter(
+  const filteredQuestions = questionRows.filter(
     (question) =>
-      game.categories.length === 0 || game.categories.includes(question.category)
+      (game.categories.length === 0 || game.categories.includes(question.category)) &&
+      (game.difficulties.length === 0 || game.difficulties.includes(question.difficulty))
   );
-  const freshQuestions = categoryQuestions
+  const freshQuestions = filteredQuestions
     .filter(
       (question) =>
         !usedQuestionIds.has(question.id) &&
@@ -96,16 +94,13 @@ export async function POST(
       id: question.id,
       category: question.category,
       familyKey: question.familyKey,
-      level: BASIC_QUESTION_TEXTS.has(question.text)
-        ? ("basic" as const)
-        : ("advanced" as const),
     }));
 
   if (freshQuestions.length < game.totalQuestions) {
-    const alreadyPlayed = categoryQuestions.length - freshQuestions.length;
+    const alreadyPlayed = filteredQuestions.length - freshQuestions.length;
     return NextResponse.json(
       {
-        error: `لا توجد أسئلة جديدة كافية في التصنيفات المختارة. استُخدم ${alreadyPlayed} سؤالاً سابقاً؛ أضف أسئلة أو اختر تصنيفات أخرى أو قلّل عدد أسئلة الجولة.`,
+        error: `لا توجد أسئلة جديدة كافية بهذه التصنيفات ومستوى الصعوبة. استُخدم ${alreadyPlayed} سؤالاً سابقاً؛ أضف أسئلة، أو وسّع التصنيفات/الصعوبة، أو قلّل عدد أسئلة الجولة.`,
       },
       { status: 400 }
     );

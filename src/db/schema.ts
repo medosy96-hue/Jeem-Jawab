@@ -16,6 +16,8 @@ export const questions = pgTable(
   {
     id: serial("id").primaryKey(),
     category: text("category").notNull(),
+    /** سهل | متوسط | صعب */
+    difficulty: text("difficulty").notNull().default("medium"),
     text: text("text").notNull(),
     /** النص بعد التطبيع لمنع التكرار حتى مع تغير الهمزات أو المسافات */
     textKey: text("text_key"),
@@ -23,6 +25,7 @@ export const questions = pgTable(
     familyKey: text("family_key"),
     options: jsonb("options").$type<string[]>().notNull(),
     correctIndex: integer("correct_index").notNull(),
+    imageUrl: text("image_url"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [uniqueIndex("questions_text_key_unique").on(t.textKey)]
@@ -36,6 +39,7 @@ export const games = pgTable("games", {
   status: text("status").notNull().default("lobby"), // lobby | playing | finished
   hostName: text("host_name").notNull(),
   categories: jsonb("categories").$type<string[]>().notNull().default([]),
+  difficulties: jsonb("difficulties").$type<string[]>().notNull().default([]),
   questionOrder: jsonb("question_order").$type<number[]>().notNull().default([]),
   questionSeconds: integer("question_seconds").notNull().default(20),
   resultSeconds: integer("result_seconds").notNull().default(5),

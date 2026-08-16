@@ -57,6 +57,7 @@ export async function GET(
     text: string;
     options: string[];
     correctIndex: number | null;
+    imageUrl: string | null;
   } | null = null;
 
   if (
@@ -80,6 +81,7 @@ export async function GET(
           phaseInfo.phase === "active"
             ? null
             : permutation.indexOf(q.correctIndex),
+        imageUrl: q.imageUrl ?? null,
       };
     }
   }
@@ -126,6 +128,7 @@ export async function GET(
     status: game.status,
     hostName: game.hostName,
     categories: game.categories,
+    difficulties: game.difficulties,
     phase: phaseInfo.phase,
     questionIndex: phaseInfo.questionIndex,
     questionNumber:

@@ -9,6 +9,7 @@ import {
   validQuestionSeconds,
   validResultSeconds,
   validTotalQuestions,
+  validDifficulties,
   CATEGORIES,
 } from "@/lib/game";
 
@@ -25,6 +26,7 @@ export async function POST(req: Request) {
   const categories: string[] = Array.isArray(body.categories)
     ? body.categories.filter((id: unknown) => validIds.has(String(id)))
     : [];
+  const difficulties = validDifficulties(body.difficulties);
   if (!hostName) {
     return NextResponse.json({ error: "أدخل اسمك أولاً" }, { status: 400 });
   }
@@ -53,6 +55,7 @@ export async function POST(req: Request) {
     totalQuestions,
     manualAdvance,
     categories,
+    difficulties,
   });
 
   const hostPlayerId = generateId();

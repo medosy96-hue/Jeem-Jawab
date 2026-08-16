@@ -13,6 +13,7 @@ export interface QuestionView {
   text: string;
   options: string[];
   correctIndex: number | null;
+  imageUrl: string | null;
 }
 
 export interface MyView {
@@ -32,6 +33,7 @@ export interface GameState {
   status: string;
   hostName: string;
   categories: string[];
+  difficulties: string[];
   phase: Phase;
   questionIndex: number;
   questionNumber: number;

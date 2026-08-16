@@ -9,7 +9,7 @@ import { AnswerOptions } from "./AnswerOptions";
 import { LeaderboardList } from "./LeaderboardList";
 import { Podium } from "./Podium";
 import { Brand } from "./Brand";
-import { CATEGORIES } from "@/lib/game";
+import { CATEGORIES, DIFFICULTY_LEVELS } from "@/lib/game";
 
 interface StoredPlayer {
   code: string;
@@ -248,6 +248,23 @@ function LobbyWait({ state }: { state: import("@/lib/types").GameState }) {
           ))
         )}
       </div>
+      <div className="mt-2 flex flex-wrap justify-center gap-1.5">
+        {state.difficulties.length === 0 ? (
+          <span className="rounded-full bg-white/10 px-3 py-1 text-[11px] font-black text-white/50">
+            🎲 كل مستويات الصعوبة
+          </span>
+        ) : (
+          state.difficulties.map((id) => (
+            <span
+              key={id}
+              className="rounded-full bg-amber-400/15 px-3 py-1 text-[11px] font-black text-amber-100"
+            >
+              {DIFFICULTY_LEVELS.find((d) => d.id === id)?.emoji}{" "}
+              {DIFFICULTY_LEVELS.find((d) => d.id === id)?.label}
+            </span>
+          ))
+        )}
+      </div>
       <div className="mt-4 flex flex-wrap justify-center gap-2 text-[11px] font-black">
         <span className="rounded-full bg-emerald-500/15 px-3 py-1.5 text-emerald-200">
           🔢 {state.totalQuestions} سؤالاً
@@ -301,6 +318,7 @@ function ActiveQuestion({
             selectedIndex={state.my?.selectedIndex ?? null}
             answered={answered}
             reveal={false}
+            imageUrl={state.question.imageUrl}
             onSelect={onSubmit}
           />
         ) : (

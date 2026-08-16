@@ -1,3 +1,16 @@
+import type { SeedQuestion } from "@/db/seed-data";
+
+/** يضبط مستوى صعوبة افتراضي لكل أسئلة حزمة بيانات لم تُحدد صعوبتها مسبقاً */
+export function withDifficulty<T extends SeedQuestion>(
+  bank: T[],
+  difficulty: "easy" | "medium" | "hard"
+): T[] {
+  return bank.map((question) => ({
+    ...question,
+    difficulty: question.difficulty ?? difficulty,
+  }));
+}
+
 /**
  * مفتاح ثابت لمنع تكرار أسئلة متشابهة نصياً.
  * يتجاهل التشكيل، اختلاف الهمزات، التطويل، والمسافات المتعددة.
