@@ -1,32 +1,15 @@
 import type { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = process.env.PUBLIC_APP_URL ?? "https://jeem-jawab.vercel.app";
-  const now = new Date();
+  const base =
+    process.env.PUBLIC_APP_URL || process.env.VERCEL_PROJECT_PRODUCTION_URL
+      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+      : "https://localhost:3000";
+
   return [
-    {
-      url: base,
-      lastModified: now,
-      changeFrequency: "weekly",
-      priority: 1,
-    },
-    {
-      url: `${base}/create?mode=local`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.8,
-    },
-    {
-      url: `${base}/create?mode=online`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.8,
-    },
-    {
-      url: `${base}/join`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.6,
-    },
+    { url: base, lastModified: new Date(), priority: 1.0 },
+    { url: `${base}/create`, lastModified: new Date(), priority: 0.8 },
+    { url: `${base}/join`, lastModified: new Date(), priority: 0.8 },
+    { url: `${base}/admin`, lastModified: new Date(), priority: 0.3 },
   ];
 }
