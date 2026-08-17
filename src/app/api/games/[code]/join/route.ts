@@ -22,12 +22,12 @@ export async function POST(
   if (!game) {
     return NextResponse.json({ error: "اللعبة غير موجودة" }, { status: 404 });
   }
-  if (game.status !== "lobby") {
-    return NextResponse.json(
-      { error: game.status === "finished" ? "انتهت هذه اللعبة" : "بدأت اللعبة ولا يمكن الانضمام الآن" },
-      { status: 400 }
-    );
-  }
+ if (game.status === "finished") {
+  return NextResponse.json(
+    { error: "انتهت هذه اللعبة، انتظر جولة جديدة" },
+    { status: 400 }
+  );
+}
 
   const count = await db
     .select({ c: players.id })

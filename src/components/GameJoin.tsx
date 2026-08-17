@@ -207,7 +207,21 @@ function PlayView({ code, player }: { code: string; player: StoredPlayer }) {
       {state.phase === "finished" && (
         <Finished state={state} onLeave={leave} />
       )}
-    </CenterShell>
+    <div className="rounded-3xl border border-white/15 bg-white/10 p-6 text-center shadow-2xl backdrop-blur-md">
+  <div className="text-5xl">⏳</div>
+  <p className="mt-3 text-lg font-black text-white">
+    بانتظار المضيف لبدء جولة جديدة...
+  </p>
+  <p className="mt-2 text-sm font-bold text-white/60">
+    ابقَ في هذه الصفحة، وستنضم تلقائياً للجولة القادمة
+  </p>
+  <button
+    onClick={onLeave}
+    className="mt-4 rounded-2xl bg-white/10 px-6 py-2 text-xs font-black text-white transition hover:bg-white/20"
+  >
+    خروج نهائي
+  </button>
+</div>
   );
 }
 

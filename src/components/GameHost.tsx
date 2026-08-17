@@ -272,7 +272,27 @@ export function GameHost({ code }: { code: string }) {
           </Card>
           <div className="flex justify-center gap-3">
             <Link href="/create" className="rounded-2xl bg-gradient-to-l from-emerald-600 to-green-500 px-6 py-3 font-black text-white shadow-lg transition hover:brightness-110">
-              لعبة جديدة 🎮
+              create 🎮
+              <button
+  onClick={async () => {
+    if (!host) return;
+    setStarting(true);
+    try {
+      await fetch(`/api/games/${code}/restart`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ playerId: host.playerId }),
+      });
+      await refresh();
+    } finally {
+      setStarting(false);
+    }
+  }}
+  disabled={starting}
+  className="rounded-2xl bg-gradient-to-l from-emerald-600 to-green-500 px-6 py-3 font-black text-white shadow-lg transition hover:brightness-110 disabled:opacity-50"
+>
+  🎮 جولة جديدة بنفس اللاعبين
+</button>
             </Link>
             <Link href="/" className="rounded-2xl bg-white/10 px-6 py-3 font-black text-white transition hover:bg-white/20">
               الرئيسية
