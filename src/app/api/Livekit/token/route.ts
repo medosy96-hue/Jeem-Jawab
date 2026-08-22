@@ -24,18 +24,19 @@ export async function POST(req: Request) {
   try {
     const at = new AccessToken(apiKey, apiSecret, {
       identity: participantName,
-      ttl: 3600,
     });
 
-at.addGrant({
-  canPublish: true,
-  canPublishData: true,
-  canSubscribe: true,
-  room: roomName,
-});
+    at.addGrant({
+      canPublish: true,
+      canPublishData: true,
+      canSubscribe: true,
+      room: roomName,
+    });
+
+    const token = await at.toJwt();
 
     return NextResponse.json({
-      token: await at.toJwt(),
+      token: token,
     });
   } catch (error) {
     console.error("Error creating token:", error);

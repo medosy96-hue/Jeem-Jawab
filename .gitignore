@@ -25,3 +25,6 @@ pnpm-debug.log*
 # Local generated files
 coverage/
 .vercel/
+
+.vercel
+.env*

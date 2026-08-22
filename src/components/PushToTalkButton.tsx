@@ -15,7 +15,7 @@ function VoiceButton() {
 
   const handleMouseDown = async () => {
     setIsHolding(true);
-    if (localParticipant?.audioTrackPublications.length === 0) {
+    if (!localParticipant?.audioTrackPublications.size) {
       await localParticipant?.setMicrophoneEnabled(true);
     }
   };
