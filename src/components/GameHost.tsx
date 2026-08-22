@@ -1,6 +1,5 @@
 "use client";
 
-import { PushToTalkButton } from "./PushToTalkButton";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useGameState } from "@/hooks/useGameState";
@@ -12,6 +11,7 @@ import { AnswerOptions } from "./AnswerOptions";
 import { LeaderboardList } from "./LeaderboardList";
 import { Podium } from "./Podium";
 import { Brand } from "./Brand";
+import { PushToTalkButton } from "./PushToTalkButton";
 import { CATEGORIES, DIFFICULTY_LEVELS } from "@/lib/game";
 import type { GameState } from "@/lib/types";
 

@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { LiveKitRoom, useLocalParticipant, useRoomContext } from "@livekit/components-react";
-import { Room, Participant } from "livekit-client";
+import { LiveKitRoom, useLocalParticipant } from "@livekit/components-react";
 
 interface PushToTalkButtonProps {
   roomName: string;
@@ -13,7 +12,6 @@ interface PushToTalkButtonProps {
 function VoiceButton() {
   const [isHolding, setIsHolding] = useState(false);
   const { localParticipant } = useLocalParticipant();
-  const room = useRoomContext();
 
   const handleMouseDown = async () => {
     setIsHolding(true);

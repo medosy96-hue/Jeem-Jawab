@@ -9,6 +9,7 @@ import { AnswerOptions } from "./AnswerOptions";
 import { LeaderboardList } from "./LeaderboardList";
 import { Podium } from "./Podium";
 import { Brand } from "./Brand";
+import { PushToTalkButton } from "./PushToTalkButton";
 import { CATEGORIES, DIFFICULTY_LEVELS } from "@/lib/game";
 
 <div className="flex justify-center mb-5">
