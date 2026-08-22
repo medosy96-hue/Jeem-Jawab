@@ -26,7 +26,6 @@ export async function POST(req: Request) {
       identity: participantName,
     });
     
-    // الطريقة الصحيحة لإضافة الصلاحيات
     at.addGrant({
       canPublish: true,
       canPublishData: true,
