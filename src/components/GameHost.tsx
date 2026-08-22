@@ -1,5 +1,6 @@
 "use client";
 
+import { PushToTalkButton } from "./PushToTalkButton";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useGameState } from "@/hooks/useGameState";
@@ -318,9 +319,18 @@ export function GameHost({ code }: { code: string }) {
   const progress = (state.questionNumber / state.totalQuestions) * 100;
   const isLastQuestion = state.questionNumber >= state.totalQuestions;
 
-  return (
-    <Shell>
-      <div className="grid gap-5 lg:grid-cols-5">
+return (
+  <Shell>
+    {/* زر الدردشة الصوتية */}
+    <div className="flex justify-center mb-5">
+      <PushToTalkButton
+        roomName={`game-${code}`}
+        playerName={host.name}
+        playerId={host.playerId}
+      />
+    </div>
+
+    <div className="grid gap-5 lg:grid-cols-5">
         {/* السؤال */}
         <div className="lg:col-span-3">
           <Card>

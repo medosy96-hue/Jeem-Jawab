@@ -11,6 +11,14 @@ import { Podium } from "./Podium";
 import { Brand } from "./Brand";
 import { CATEGORIES, DIFFICULTY_LEVELS } from "@/lib/game";
 
+<div className="flex justify-center mb-5">
+  <PushToTalkButton
+    roomName={`game-${state.code}`}
+    playerName={state.my?.name ?? "لاعب"}
+    playerId={state.my?.playerId ?? ""}
+  />
+</div>
+
 interface StoredPlayer {
   code: string;
   playerId: string;
