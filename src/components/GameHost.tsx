@@ -322,13 +322,14 @@ export function GameHost({ code }: { code: string }) {
 return (
   <Shell>
     {/* زر الدردشة الصوتية */}
-    <div className="flex justify-center mb-5">
-      <PushToTalkButton
-        roomName={`game-${code}`}
-        playerName={host.name}
-        playerId={host.playerId}
-      />
-    </div>
+   <div className="flex justify-center mb-5 bg-red-500 p-4">
+  <span>الزر موجود هنا</span>
+  <PushToTalkButton
+    roomName={`game-${code}`}
+    playerName={host.name}
+    playerId={host.playerId}
+  />
+</div>
 
     <div className="grid gap-5 lg:grid-cols-5">
         {/* السؤال */}
