@@ -1,4 +1,4 @@
-import { AccessToken, VideoGrant } from "livekit";
+import { AccessToken } from "livekit-server-sdk";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -27,14 +27,12 @@ export async function POST(req: Request) {
       ttl: 3600,
     });
 
-    const videoGrant = new VideoGrant({
-      canPublish: true,
-      canPublishData: true,
-      canSubscribe: true,
-      room: roomName,
-    });
-
-    at.addGrant(videoGrant);
+at.addGrant({
+  canPublish: true,
+  canPublishData: true,
+  canSubscribe: true,
+  room: roomName,
+});
 
     return NextResponse.json({
       token: await at.toJwt(),
