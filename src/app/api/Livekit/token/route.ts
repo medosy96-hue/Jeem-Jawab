@@ -22,18 +22,22 @@ export async function POST(req: Request) {
   }
 
   try {
-    const token = new AccessToken(apiKey, apiSecret, {
+    const at = new AccessToken(apiKey, apiSecret, {
       identity: participantName,
-      grants: {
-        canPublish: true,
-        canPublishData: true,
-        canSubscribe: true,
-        room: roomName,
-      },
+    });
+    
+    // الطريقة الصحيحة لإضافة الصلاحيات
+    at.addGrant({
+      canPublish: true,
+      canPublishData: true,
+      canSubscribe: true,
+      room: roomName,
     });
 
+    const token = await at.toJwt();
+    
     return NextResponse.json({
-      token: await token.toJwt(),
+      token: token,
     });
   } catch (error) {
     console.error("Error creating token:", error);
