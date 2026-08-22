@@ -1,4 +1,4 @@
-import { AccessToken } from "livekit-server-sdk";
+import { AccessToken, VideoGrant } from "livekit";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -24,19 +24,20 @@ export async function POST(req: Request) {
   try {
     const at = new AccessToken(apiKey, apiSecret, {
       identity: participantName,
+      ttl: 3600,
     });
-    
-    at.addGrant({
+
+    const videoGrant = new VideoGrant({
       canPublish: true,
       canPublishData: true,
       canSubscribe: true,
       room: roomName,
     });
 
-    const token = await at.toJwt();
-    
+    at.addGrant(videoGrant);
+
     return NextResponse.json({
-      token: token,
+      token: await at.toJwt(),
     });
   } catch (error) {
     console.error("Error creating token:", error);
