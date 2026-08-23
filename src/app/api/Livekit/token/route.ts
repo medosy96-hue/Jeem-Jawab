@@ -1,4 +1,3 @@
-import { AccessToken } from "livekit-server-sdk";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -11,37 +10,53 @@ export async function POST(req: Request) {
     );
   }
 
-  const apiKey = process.env.LIVEKIT_API_KEY;
-  const apiSecret = process.env.LIVEKIT_API_SECRET;
+  const apiKey = process.env.DAILY_API_KEY;
 
-  if (!apiKey || !apiSecret) {
+  if (!apiKey) {
     return NextResponse.json(
-      { error: "LiveKit مو منصب صح" },
+      { error: "Daily.co API key missing" },
       { status: 500 }
     );
   }
 
   try {
-    const at = new AccessToken(apiKey, apiSecret, {
-      identity: participantName,
+    const res = await fetch("https://api.daily.co/v1/rooms", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        name: roomName,
+        privacy: "private",
+      }),
     });
 
-    at.addGrant({
-      canPublish: true,
-      canPublishData: true,
-      canSubscribe: true,
-      room: roomName,
-    });
+    if (!res.ok) {
+      // الغرفة قد تكون موجودة بالفعل
+      if (res.status === 409) {
+        return NextResponse.json({
+          token: "daily-token-placeholder",
+          url: `https://daily.co/${roomName}`,
+        });
+      }
+      return NextResponse.json(
+        { error: "Failed to create room" },
+        { status: 500 }
+      );
+    }
 
-    const token = await at.toJwt();
+    const data = await res.json();
 
     return NextResponse.json({
-      token: token,
+      token: "daily-token-placeholder",
+      url: data.url,
+      roomName: roomName,
     });
   } catch (error) {
-    console.error("Error creating token:", error);
+    console.error("Error:", error);
     return NextResponse.json(
-      { error: "تعذر إنشاء token الاتصال" },
+      { error: "تعذر إنشاء الغرفة" },
       { status: 500 }
     );
   }

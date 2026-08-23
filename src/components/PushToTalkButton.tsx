@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { LiveKitRoom, useLocalParticipant } from "@livekit/components-react";
+import { useRoomContext } from "@daily-co/daily-react";
 
 interface PushToTalkButtonProps {
   roomName: string;
@@ -9,50 +9,17 @@ interface PushToTalkButtonProps {
   playerId: string;
 }
 
-function VoiceButton() {
-  const [isHolding, setIsHolding] = useState(false);
-  const { localParticipant } = useLocalParticipant();
-
-  const handleMouseDown = async () => {
-    setIsHolding(true);
-    if (!localParticipant?.audioTrackPublications.size) {
-      await localParticipant?.setMicrophoneEnabled(true);
-    }
-  };
-
-  const handleMouseUp = () => {
-    setIsHolding(false);
-    localParticipant?.setMicrophoneEnabled(false);
-  };
-
-  return (
-    <button
-      onMouseDown={handleMouseDown}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseUp}
-      onTouchStart={handleMouseDown}
-      onTouchEnd={handleMouseUp}
-      className={`rounded-full px-6 py-3 font-black text-white transition ${
-        isHolding
-          ? "bg-red-500 scale-110 shadow-lg shadow-red-500"
-          : "bg-emerald-500 hover:bg-emerald-400"
-      }`}
-    >
-      {isHolding ? "🎤 جاري التحدث..." : "🎤 اضغط لتتحدث"}
-    </button>
-  );
-}
-
 export function PushToTalkButton({
   roomName,
   playerName,
   playerId,
 }: PushToTalkButtonProps) {
-  const [token, setToken] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [meetingUrl, setMeetingUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    const getToken = async () => {
+    const createRoom = async () => {
       try {
         const res = await fetch("/api/livekit/token", {
           method: "POST",
@@ -62,18 +29,22 @@ export function PushToTalkButton({
             participantName: playerName,
           }),
         });
+
         const data = await res.json();
         if (!res.ok) {
-          setError(data.error ?? "تعذر الاتصال بالدردشة الصوتية");
+          setError(data.error ?? "تعذر إنشاء الغرفة");
           return;
         }
-        setToken(data.token);
+
+        setMeetingUrl(data.url);
       } catch (err) {
         setError("خطأ في الاتصال");
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    getToken();
+    createRoom();
   }, [roomName, playerName]);
 
   if (error) {
@@ -84,7 +55,7 @@ export function PushToTalkButton({
     );
   }
 
-  if (!token) {
+  if (isLoading) {
     return (
       <div className="rounded-full bg-white/10 px-6 py-3 text-center text-xs font-black text-white/70">
         جاري التحضير...
@@ -92,19 +63,18 @@ export function PushToTalkButton({
     );
   }
 
+  if (!meetingUrl) {
+    return null;
+  }
+
   return (
-    <LiveKitRoom
-      video={false}
-      audio={true}
-      token={token}
-      serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_URL}
-      connectOptions={{ autoSubscribe: true }}
-      onError={(err) => {
-        console.error("LiveKit Error:", err);
-        setError("خطأ في الاتصال الصوتي");
-      }}
+    
+      href={meetingUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="rounded-full bg-emerald-500 px-6 py-3 font-black text-white transition hover:bg-emerald-400"
     >
-      <VoiceButton />
-    </LiveKitRoom>
+      🎤 افتح الدردشة الصوتية
+    </a>
   );
 }
