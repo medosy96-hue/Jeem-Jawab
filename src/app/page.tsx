@@ -61,7 +61,7 @@ export default function HomePage() {
         </Link>
 
         <a
-          href="https://harif-e4t3jdoqf-dirki.vercel.app/"
+          href="https://harif-ism.vercel.app/"
           target="_blank"
           rel="noopener noreferrer"
           className="group flex flex-col overflow-hidden rounded-3xl border border-white/15 bg-white/5 text-center shadow-2xl backdrop-blur-md transition hover:-translate-y-1 hover:border-white/40 hover:bg-white/10"
