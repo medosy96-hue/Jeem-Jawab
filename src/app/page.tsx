@@ -23,7 +23,7 @@ export default function HomePage() {
       <JoinCodeForm />
 
       {/* اختيار الوضع */}
-      <div className="mt-8 grid w-full max-w-2xl gap-5 sm:grid-cols-2">
+      <div className="mt-8 grid w-full max-w-4xl gap-5 sm:grid-cols-3">
         <Link
           href="/create?mode=local"
           className="group rounded-3xl border border-emerald-400/25 bg-emerald-500/10 p-7 text-center shadow-2xl backdrop-blur-md transition hover:-translate-y-1 hover:border-emerald-400/60 hover:bg-emerald-500/15"
@@ -59,6 +59,30 @@ export default function HomePage() {
             ابدأ الآن
           </span>
         </Link>
+
+        <a
+          href="https://harif-ism-git-main-dirki.vercel.app/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group flex flex-col overflow-hidden rounded-3xl border border-white/15 bg-white/5 text-center shadow-2xl backdrop-blur-md transition hover:-translate-y-1 hover:border-white/40 hover:bg-white/10"
+        >
+          <img
+            src="/harf-ism-preview.png"
+            alt="حرف اسم — لعبة حروف عربية"
+            className="w-full transition group-hover:scale-105"
+          />
+          <div className="flex flex-1 flex-col items-center justify-center p-5">
+            <h2 className="text-xl font-black text-white">🔤 حرف اسم</h2>
+            <p className="mt-2 text-sm font-bold leading-relaxed text-white/60">
+              جرّب لعبتنا التانية!
+              <br />
+              <span className="text-teal-300">تحدّي حروف عربي سريع</span>
+            </p>
+            <span className="mt-4 inline-block rounded-2xl bg-gradient-to-l from-teal-600 to-emerald-500 px-6 py-2.5 font-black text-white shadow-lg transition group-hover:brightness-110">
+              العب الآن
+            </span>
+          </div>
+        </a>
       </div>
 
       {/* كيف تلعب */}
